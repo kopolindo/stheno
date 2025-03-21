@@ -65,6 +65,8 @@ public class MainScreenController implements Initializable {
     private final List<String> intentListWithFullInfo = new ArrayList<>();
     private SocClient socketClient;
 
+    private List<CSVItem> csvItems = new ArrayList<>();
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialize TableView columns
@@ -199,9 +201,12 @@ public class MainScreenController implements Initializable {
             String destinationPackage = intent.getString("targetPackageName");
             String destinationClassName = intent.getString("targetClassName");
             Boolean isExported = intent.getBoolean("targetIsExported");
+            String bundleString = (String) intent.get("extras");
             intentListWithFullInfo.add(newItem);
-            Platform.runLater(() -> intentsList.add(new IntentItem(intentListWithFullInfo.size() - 1, description, destinationPackage, destinationClassName, isExported)));
-
+            Integer index = intentListWithFullInfo.size() - 1;
+            Platform.runLater(() -> intentsList.add(new IntentItem(index, description, destinationPackage, destinationClassName, isExported)));
+            csvItems.add(new CSVItem(index, description, destinationPackage, destinationClassName, isExported, bundleString));
+            CSVExporter.writeToCSV(csvItems, "output.csv");
         } catch (Exception e) {
             e.printStackTrace();
         }
